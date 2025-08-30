@@ -81,7 +81,7 @@ Before you begin, ensure you have:
 
 ```text
 ms-access-budgeting-tool/
-├── BudgetTool.accdb       # Main Access database file
+├── BudgetTool.mdb         # Main Access database file (2003 version)
 ├── code/
 │   ├── queries/           # .sql exports of Jet SQL queries
 │   └── vba/               # .bas and .cls files for each module
