@@ -29,7 +29,7 @@ End users enter budget figures via friendly forms. Managers consolidate data, ru
 
 Before you begin, ensure you have:
 
-- Microsoft Access 2016 or later (full version or runtime)  
+- Microsoft Access 2003 or later (full version or runtime)  
 - Git installed on your machine  
 - A Windows environment (Access is Windows-only)  
 - Basic familiarity with GitHub, Git, and Access navigation  
@@ -58,7 +58,7 @@ Before you begin, ensure you have:
 ## 4. Implementation Steps
 
 1. Back up any existing Access projects before importing.  
-2. Double-click `BudgetTool.accdb` to open in Access.  
+2. Double-click `BudgetTool.mdb` to open in Access.  
 3. If prompted, click **Enable Content** to allow VBA macros and ActiveX controls.  
 4. In the VBA editor (press Alt+F11), go to **Tools → References** and confirm the following libraries are checked:  
    - Microsoft Office 16.0 Object Library  
@@ -81,7 +81,7 @@ Before you begin, ensure you have:
 
 ```text
 ms-access-budgeting-tool/
-├── BudgetTool.accdb       # Main Access database file
+├── BudgetTool.mdb         # Main Access database file (2003 version)
 ├── code/
 │   ├── queries/           # .sql exports of Jet SQL queries
 │   └── vba/               # .bas and .cls files for each module
