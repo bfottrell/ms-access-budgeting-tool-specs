@@ -1,0 +1,32 @@
+SELECT
+    [GL_ReportTransition - Link].FiscalYear,
+    [GL_ReportTransition - Link].ABCode,
+    [GL_ReportTransition - Link].RollupCode,
+    Sum([GL_ReportTransition - Link].Period1) AS SumOfPeriod1,
+    Sum([GL_ReportTransition - Link].Period2) AS SumOfPeriod2,
+    Sum([GL_ReportTransition - Link].Period3) AS SumOfPeriod3,
+    Sum([GL_ReportTransition - Link].Period4) AS SumOfPeriod4,
+    Sum([GL_ReportTransition - Link].Period5) AS SumOfPeriod5,
+    Sum([GL_ReportTransition - Link].Period6) AS SumOfPeriod6,
+    Sum([GL_ReportTransition - Link].Period7) AS SumOfPeriod7,
+    Sum([GL_ReportTransition - Link].Period8) AS SumOfPeriod8,
+    Sum([GL_ReportTransition - Link].Period9) AS SumOfPeriod9,
+    Sum([GL_ReportTransition - Link].Period10) AS SumOfPeriod10,
+    Sum([GL_ReportTransition - Link].Period11) AS SumOfPeriod11,
+    Sum([GL_ReportTransition - Link].Period12) AS SumOfPeriod12
+FROM
+    [GL_ReportTransition - Link]
+GROUP BY
+    [GL_ReportTransition - Link].FiscalYear,
+    [GL_ReportTransition - Link].ABCode,
+    [GL_ReportTransition - Link].RollupCode
+HAVING
+    (
+        (
+            ([GL_ReportTransition - Link].FiscalYear) = "2006"
+        )
+        AND (([GL_ReportTransition - Link].ABCode) = "Actual")
+        AND (
+            ([GL_ReportTransition - Link].RollupCode) = "Sales"
+        )
+    );     

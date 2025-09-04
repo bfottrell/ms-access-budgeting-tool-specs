@@ -1,0 +1,19 @@
+DELETE tbl_SalesFiscal.CustomerNumber
+FROM
+    tbl_SalesFiscal
+WHERE
+    (
+        (
+            (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'SAF*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'ALB*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'COS*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'KRO*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'HEB*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'RAL*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'HAR*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'MAR*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'ROU*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'WIN*'
+            AND (tbl_SalesFiscal.CustomerNumber) NOT LIKE 'ROB*'
+        )
+    );

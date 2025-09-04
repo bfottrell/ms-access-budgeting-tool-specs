@@ -1,0 +1,59 @@
+Attribute VB_Name = "Adjustments"
+Option Compare Database
+Option Explicit
+
+Function CostAdjust()
+
+Dim DB As Database
+Dim RS1 As Recordset
+Dim RS2 As Recordset
+Dim RS3 As Recordset
+Dim strAccount As String
+Dim strFY As String
+Dim strAB As String
+Dim curPeriod1 As Currency
+Dim curPeriod1Adj As Currency
+Dim curPeriod12 As Currency
+Dim curPeriod12Adj As Currency
+Dim curAdj As Currency
+Dim strFYField As String
+Dim strLFY As String
+Dim strSQL As String
+
+' Place Adjustments
+
+strSQL = "UPDATE tbl_Adjustment INNER JOIN GL_ReportTransition ON tbl_Adjustment.Account = " & _
+         "GL_ReportTransition.Account SET GL_ReportTransition.EFYAdjustment = [tbl_Adjustment]![Adj2005] " & _
+         "WHERE (((GL_ReportTransition.ABCode)='Actual') AND ((GL_ReportTransition.FiscalYear)='2005'));"
+
+    DoCmd.RunSQL strSQL
+
+strSQL = "UPDATE tbl_Adjustment INNER JOIN GL_ReportTransition ON tbl_Adjustment.Account = " & _
+         "GL_ReportTransition.Account SET GL_ReportTransition.BFYAdjustment = [tbl_Adjustment]![Adj2006] " & _
+         "WHERE (((GL_ReportTransition.ABCode)='Actual') AND ((GL_ReportTransition.FiscalYear)='2006'));"
+
+    DoCmd.RunSQL strSQL
+
+strSQL = "UPDATE GL_ReportTransition SET GL_ReportTransition.Period10 = [Period10]-[EFYAdjustment] " & _
+         "WHERE (((GL_ReportTransition.RollupCode)='Sales') AND ((GL_ReportTransition.FiscalYear)='2005'));"
+    
+    DoCmd.RunSQL strSQL
+    
+strSQL = "UPDATE GL_ReportTransition SET GL_ReportTransition.Period9 = [Period9]+[BFYAdjustment] " & _
+         "WHERE (((GL_ReportTransition.RollupCode)='Sales') AND ((GL_ReportTransition.FiscalYear)='2005'));"
+    
+    DoCmd.RunSQL strSQL
+
+strSQL = "UPDATE GL_ReportTransition SET GL_ReportTransition.Period10 = [Period10]-[BFYAdjustment] " & _
+         "WHERE (((GL_ReportTransition.RollupCode)='Sales') AND ((GL_ReportTransition.FiscalYear)='2006'));"
+    
+    DoCmd.RunSQL strSQL
+    
+strSQL = "UPDATE GL_ReportTransition SET GL_ReportTransition.Period9 = [Period9]+[BFYAdjustment] " & _
+         "WHERE (((GL_ReportTransition.RollupCode)='Sales') AND ((GL_ReportTransition.FiscalYear)='2006'));"
+    
+    DoCmd.RunSQL strSQL
+
+End Function
+
+

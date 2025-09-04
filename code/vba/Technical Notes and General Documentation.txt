@@ -1,0 +1,219 @@
+
+' Welcome to the Cottage Bakery Budget Planning Tool.
+
+' This module has been created to pass on important technical information
+' to the CBI IT staff, or any other developer who may be contracted to
+' maintain or update this tool.
+
+' This module will cover general design practices and attempt to answer the
+' "Why did he do it that way?" and "What was he thinking?" sort of questions.
+
+' Detailed, step-by-step, explanations regarding form, function, and process
+' are documented in each of the form, report, and individual modules.
+
+' ============================================================================
+
+' ACCESS DEVELOPMENT CONVENTIONS
+
+' 1.  Read the descriptions in the main database window.  I have left brief
+'     notes describing the function of every database object.
+
+' 2.  No macros.  As of Access 2000, macros became little more than VBA with
+'     a user interface.  User interfaces take up memory, and cause more system
+'     overhead.
+
+'     While I respect the fact that novices use wizards and macros, when
+'     you get to this level (and you should be, if you're reading this),
+'     and are knowledgable in VBA, you can cut out the middle man.
+
+' 3.  Fewer queries.  As many queries as there are, there is a lot more SQL
+'     in this database than you think.  Most of the modules use SQL strings
+'     to define recordsets in VBA, and the DoCmd.RunSQL method is used to
+'     run action queries throughout the tool.
+
+'     I use this method to clean up the number of objects the tool must keep
+'     track of.
+
+' 4.  I have standardized most of the object names as follows: Tables = tblxxxx,
+'     Queries = qryxxxx, Forms = frmxxxx, and Reports = rptxxxx.  No special
+'     conventions were used for modules.
+
+'     For example, if you're searching for an object name in a module,
+'     you'll find it much easier to open the find dialog, type "qry" and
+'     search through the results, rather than parse a very large code segment.
+
+' MODULE CONSTRUCTION
+
+' 1.  You will notice the use of the Option Explicit statement in the
+'     Declarations section of every module.  This is a method that is
+'     generally considered optional, and to some developers, irritating.
+'     It is something that I learned as a student many moons ago, and it
+'     allows another layer of error protection for the developer, and in
+'     the end, greater stability for the client.
+
+'     I recommend the statement in any changes, or in any new modules you
+'     may create.
+
+' 2.  Where practical, I try to remember to use standard indentation and
+'     spacing in my code for readability and troubleshooting.  I apologize
+'     if you find procedures that have not been cleaned up.
+
+' 3.  In many procedures, you will notice the use and declaration of the
+'     variable strQuote, with a value of Chr$(34).  For those who have not
+'     used VB/SQL methods extensively, VBA will not allow the use of quotes
+'     in a VBA/SQL SELECT statement, though they are required by SQL, so
+'     you'll have to use this work-around if you intend to use the SQL
+'     statements to their fullest.
+
+'     The DoCmd.RunSQL command (used for action queries) however, while not
+'     allowing quotes, does allow you to simply replace the quotes with
+'     apostrophes.
+
+' 4.  As with most contracts, this one had deadlines.  Depending on the time
+'     requirements, I often brain-storm and allow ideas to spill out onto the
+'     screen, so-to-speak.  Because of this, while my procedures work, they
+'     may well be less efficient than they could be.
+
+'     Feel free to make changes to improve performance, but remember...
+'     IT WORKS NOW!  Don't do anything that loses, corrupts, or makes
+'     unusable, client data!
+
+' 5.  In a number of procedures, you'll notice the operation "* - 1" used
+'     to convert negative to positive values.  This is done because MAS 200
+'     deals with expenses as credits, and credits as expenses (i.e.: an expense
+'     is formatted as $2,000.00 and a credit as ($2,000.00).  Using proper
+'     accounting formatting, the reverse is true.  Because MAS 200 deals with
+'     a far greater number of expenses, the designers apparently felt it easier
+'     to reverse this.  For the sake of continuity and readability, not to
+'     mention the calculations performed by this tool, I have switched this
+'     back to proper convention.
+
+' TABLE DESIGN
+
+' 1.  Where are the relationships?  As VBA/SQL was used extensively throughout
+'     this project, the need for the establishment of relationships was
+'     unnecessary.  VBA allows the designer to pick and choose data elements,
+'     perform required calculations, and deposit them as desired.  Also, the
+'     security requirements of this design demanded that client data be
+'     transitory on the client versions.  In other words, I had to use my local
+'     tables, where practical, as nothing more than staging tables.  The
+'     relationships that do exist are up on the SQL Server.
+
+'     Over time, experience has taught me to use every tool in my toolbox, and
+'     VBA, being a native language to Access, has become a most useful tool.
+
+' 2.  I have tried whenever possible, to use easily identifiable field names
+'     within my tables, so you shouldn't have any problems tracking items
+'     between them.
+
+'     There are a couple of variations I have made to the field names between
+'     the MAS 200 fields on the SQL Server and this tool.  These follow:
+
+'     *  RollupCode1 becomes RollupCode at the tool level
+'     *  ABCode was created to show the difference between data from the tables
+'        dbo_BnH_Actual and dbo_BnH_Budget.
+
+' 3.  "Live" tables.  The tables dbo_BnH_Actual and dbo_BnH_Budget contain
+'     MAS 200 data, that is refreshed daily.  There are a few cases where I've
+'     tapped these tables dirctly however, generally this data is passed to
+'     the table tbl_BnH_Temp for reformatting and dissemination throughout
+'     the rest of the tool.
+
+' 4.  "Static" tables.  The table dbo_tbl_Next_FY_Projection has been manually
+'     populated (currently with 2006 and 2007 data), and is updated by the
+'     individual cost center lead with his/her forecast data.
+
+'     The table dbo_tbl_Next_FY_Sales_Projection has been manually populated
+'     (currently with 2005, 2006, and 2007 data), and is updated by the COO
+'     or Adrienne with forecasted sales data.
+
+'     The reason there is no method in place to automatically refresh the
+'     static tables, is because there was some question about overwriting
+'     forecasted periods in the current FY projection with live mass data.
+'     This occurring during a forecasting period would show marked value
+'     differences, and potentially cause an error in budgeting.  If you come
+'     up with a solution to this, please implement it.
+
+' 5.  Before beginning the 2008 budgeting season, you must replace 2005 data in
+'     the table tbl_ForecastStaging_LY with 2006 data.  Also, you must replace
+'     2006 and 2007 data in the tables dbo_tbl_Next_FY_Projection and
+'     dbo_tbl_Next_FY_Sales_Staging with 2007 and 2008 data.
+
+' QUERY DESIGN
+
+' 1.  As with the above tables, I've tried to keep relationships simple.  There
+'     are none.  I use the various queries for very simple operations over
+'     large groups of records.  For everything else, I've taken a more surgical
+'     VBA/SQL approach.
+
+' 2.  Date sensitivity.  Most of the queries and module procedures in this tool
+'     are designed to be date insensitive.  That is, the client will be
+'     able to use this tool next year, and the year after that and so on,
+'     without going through major revisions.  There were some cases however,
+'     where Access had trouble interpreting the instructions I was using and I
+'     had to leave some queries with static dates.  I've marked them with an "*"
+'     in their description line in the database properties window.  You'll have
+'     to go through and change some of these values just before CBI begins it's
+'     2008 budgeting season.  you're looking at about 2-3 minutes worth of work,
+'     as most of them will run fine as is.
+
+' FORM DESIGN
+
+' 1. The forms have been designed using, where practical, Microsoft conventions.
+'    Color, placement of buttons, text boxes, form sizes, etc...
+
+'    One of the first things I learned in this business is to design forms and
+'    reports so they look like everything else.  It sounds boring, but the end
+'    user does not want vibrant, exciting user interfaces...no matter what they
+'    tell you.  Over time, often subconsciousely, the user will become disoriented
+'    by all of the bells and whistles, so keep your formatting simple and
+'    standardized.
+
+' 2. As with the reports, if a control has a value assigned to it, or it is referenced
+'    by another control or procedure, it will have a unique name.  I use a standard
+'    naming convention to more easily identify controls from code:
+'
+'    cmbxxx = Combobox
+'    lstxxx = Listbox
+'    txtxxx = Textbox
+'    btnxxx = Button
+
+'    and so on...
+
+' REPORT DESIGN
+
+' 1. The reports have been designed using, where practical, Microsoft conventions.
+'    Color, placement of buttons, text boxes, display, etc...
+
+' 2. As with the forms, if a control has a value assigned to it, or it is referenced
+'    by another control or procedure, it will have a unique name.  I use a standard
+'    naming convention to more easily identify controls from code:
+'
+'    cmbxxx = Combobox
+'    lstxxx = Listbox
+'    txtxxx = Textbox
+'    btnxxx = Button
+
+'    and so on...
+
+' 3. Most of the reports have a summary section in the report footer.  These sections
+'    are not part of the standard report rollout, but instead have their values
+'    independently calculated and/or referenced in a module and plugged into a specific
+'    report control.
+
+'    As with item 2, these controls have standardized names.  I only bring this up
+'    because knowing my naming conventions will help you in troubleshooting this system
+'    should you decide to change it.  Try this name as an example:
+
+'    txtP11B06-BagelProd
+
+'    [txt]          = Textbox
+'    [P11]          = Period 11
+'    [B]            = Budget
+'    [06]           = 2006 (or current year when date insensitivity is applied)
+'    [-BagelProd]   = In this case, there is/are other control(s) of the same name but
+'                     contain values for BagelPack or for DanishProd, and so on...
+
+'    In a nutshell, that is the general method I use, and while it may not be the
+'    easiest to grasp, or what you might prefer, it is what I used and hopefully won't
+'    cause you too many difficulties.

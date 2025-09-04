@@ -1,0 +1,167 @@
+Option Compare Database
+Option Explicit
+
+Function Append()
+
+Dim strSQL As String
+
+    strSQL = "DELETE tbl_SalesCalender.* " & _
+        "FROM tbl_SalesCalender;"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "INSERT INTO tbl_SalesCalender ( CustomerNumber, CalYear, JanAmount, FebAmount, MarAmount, AprAmount, MayAmount, JunAmount, JulAmount, AugAmount, SepAmount, OctAmount, NovAmount, DecAmount ) " & _
+        "SELECT bfottrell_vw_SM_CalendarView.CustomerNumber, bfottrell_vw_SM_CalendarView.CalYear, bfottrell_vw_SM_CalendarView.Jan, bfottrell_vw_SM_CalendarView.Feb, bfottrell_vw_SM_CalendarView.Mar, bfottrell_vw_SM_CalendarView.Apr, bfottrell_vw_SM_CalendarView.May, bfottrell_vw_SM_CalendarView.Jun, bfottrell_vw_SM_CalendarView.Jul, bfottrell_vw_SM_CalendarView.Aug, bfottrell_vw_SM_CalendarView.Sep, bfottrell_vw_SM_CalendarView.Oct, bfottrell_vw_SM_CalendarView.Nov, bfottrell_vw_SM_CalendarView.Dec " & _
+        "FROM bfottrell_vw_SM_CalendarView;"
+    DoCmd.RunSQL strSQL
+
+    Call NullFix
+
+End Function
+'__________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function NullFix()
+
+Dim strSQL As String
+
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.JanAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.JanAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.FebAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.FebAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.MarAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.MarAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.AprAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.AprAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.MayAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.MayAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.JunAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.JunAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.JulAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.JulAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.AugAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.AugAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.SepAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.SepAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.OctAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.OctAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.NovAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.NovAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesCalender SET tbl_SalesCalender.DecAmount = 0 " & _
+        "WHERE (((tbl_SalesCalender.DecAmount) Is Null));"
+    DoCmd.RunSQL strSQL
+
+    Call Convert
+
+End Function
+'__________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function Convert()
+
+Dim DB As Database
+Dim RS1 As Recordset
+Dim RS2 As Recordset
+Dim strCustNum As String
+Dim strLY As String
+Dim strNY As String
+Dim strCY As String
+Dim curJan As Currency
+Dim curFeb As Currency
+Dim curMar As Currency
+Dim curApr As Currency
+Dim curMay As Currency
+Dim curJun As Currency
+Dim curJul As Currency
+Dim curAug As Currency
+Dim curSep As Currency
+Dim curOct As Currency
+Dim curNov As Currency
+Dim curDec As Currency
+Dim strSQL As String
+
+    strSQL = "DELETE tbl_SalesFiscal.* " & _
+        "FROM tbl_SalesFiscal;"
+    DoCmd.RunSQL strSQL
+
+Set DB = CurrentDb()
+Set RS1 = DB.OpenRecordset("tbl_SalesCalender", DB_OPEN_DYNASET)
+Set RS2 = DB.OpenRecordset("tbl_SalesFiscal", DB_OPEN_DYNASET)
+
+Do While Not RS1.EOF
+
+    strCustNum = RS1.Fields("CustomerNumber").Value
+    strCY = RS1.Fields("CalYear").Value
+    strNY = strCY + 1
+        
+    curJan = RS1.Fields("JulAmount").Value
+    curFeb = RS1.Fields("AugAmount").Value
+    curMar = RS1.Fields("SepAmount").Value
+    curApr = RS1.Fields("OctAmount").Value
+    curMay = RS1.Fields("NovAmount").Value
+    curJun = RS1.Fields("DecAmount").Value
+        
+    RS2.AddNew
+    RS2.Fields("CustomerNumber").Value = strCustNum
+    RS2.Fields("CalYear").Value = strNY
+    RS2.Fields("Period1").Value = curJan
+    RS2.Fields("Period2").Value = curFeb
+    RS2.Fields("Period3").Value = curMar
+    RS2.Fields("Period4").Value = curApr
+    RS2.Fields("Period5").Value = curMay
+    RS2.Fields("Period6").Value = curJun
+    RS2.Update
+    RS1.MoveNext
+    
+Loop
+
+RS1.MoveFirst
+RS2.MoveFirst
+
+Do While Not RS1.EOF
+
+    strCustNum = RS1.Fields("CustomerNumber").Value
+    strCY = RS1.Fields("CalYear").Value
+    strNY = strCY + 1
+        
+    curJul = RS1.Fields("JanAmount").Value
+    curAug = RS1.Fields("FebAmount").Value
+    curSep = RS1.Fields("MarAmount").Value
+    curOct = RS1.Fields("AprAmount").Value
+    curNov = RS1.Fields("MayAmount").Value
+    curDec = RS1.Fields("JunAmount").Value
+        
+    RS2.AddNew
+    RS2.Fields("CustomerNumber").Value = strCustNum
+    RS2.Fields("CalYear").Value = strCY
+    RS2.Fields("Period7").Value = curJul
+    RS2.Fields("Period8").Value = curAug
+    RS2.Fields("Period9").Value = curSep
+    RS2.Fields("Period10").Value = curOct
+    RS2.Fields("Period11").Value = curNov
+    RS2.Fields("Period12").Value = curDec
+    RS2.Update
+    RS1.MoveNext
+    
+Loop
+    
+End Function

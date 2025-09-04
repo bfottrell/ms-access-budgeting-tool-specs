@@ -1,0 +1,208 @@
+Option Compare Database
+Option Explicit
+
+Function IS_OPS()
+
+Dim DB As Database
+Dim RS As Recordset
+Dim strSQL As String
+Dim strQuote As String * 1
+Dim strFY As String
+Dim strLY As String
+Dim strPeriodOld As String
+Dim strPeriodNew As String
+Dim strPeriod As String
+
+strFY = Forms!Switchboard!cmbFY.Value
+strLY = strFY - 1
+strPeriod = "Period"
+strPeriodOld = Forms!Switchboard!cmbPeriod.Value
+strQuote = Chr(34)
+
+strPeriodOld = Right(strPeriodOld, 2)
+strPeriodOld = Trim(strPeriodOld)
+strPeriodNew = strPeriod & strPeriodOld
+
+    strSQL = "DELETE tbl_IS_RalCorp_Format.* " & _
+             "FROM tbl_IS_RalCorp_Format;"
+    DoCmd.RunSQL strSQL
+
+'================================================================================================================
+'                                        CURRENT ACTUAL
+' Net Sales
+
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS Expr1, 'Customer Sales' " & _
+             "AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC) Between '4100' And '4130') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+    
+    ' Used, as a placeholder, if Interdivision Sales is not applicable to CBI
+    
+    Set DB = CurrentDb()
+    Set RS = DB.OpenRecordset("tbl_IS_RalCorp_Format", DB_OPEN_DYNASET)
+    RS.AddNew
+    RS.Fields("Account").Value = "0000-00-00-00-000001"
+    RS.Fields("Description").Value = "Interdivision Sales"
+    RS.Fields("MAC").Value = "0001"
+    RS.Update
+    RS.Close
+    DB.Close
+    
+    ' Used if Interdivision Sales is applicable to CBI
+    
+    'strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS Expr1, 'Interdivision Sales' " & _
+             "AS Expr1, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC)='') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    'DoCmd.RunSQL strSQL
+    
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS Expr1, " & _
+             "'Discounts & Allowances' AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC) Between '4500' And '4520' Or (GL_ReportTransition.MAC)='7451' " & _
+             "Or (GL_ReportTransition.MAC)='7402' Or (GL_ReportTransition.MAC)='7403' Or " & _
+             "(GL_ReportTransition.MAC)='7404' Or (GL_ReportTransition.MAC)='7406' Or " & _
+             "(GL_ReportTransition.MAC)='7411' Or (GL_ReportTransition.MAC)='7414') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+
+' Gross Profit
+
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS Expr1, " & _
+             "'Materials & Supplies' AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC) Between '5100' And '5700' Or (GL_ReportTransition.MAC)='7134' Or " & _
+             "(GL_ReportTransition.MAC)='9100') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS Expr1, " & _
+             "'Operating Expenses' AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC) Between '6100' And '7133' Or (GL_ReportTransition.MAC)='7136' Or " & _
+             "(GL_ReportTransition.MAC) Between '7142' And '7147' Or (GL_ReportTransition.MAC) Between '7160' " & _
+             "And '7162' Or (GL_ReportTransition.MAC) Between '7201' And '7350' Or " & _
+             "(GL_ReportTransition.MAC)='7412' Or (GL_ReportTransition.MAC)='7451' Or " & _
+             "(GL_ReportTransition.MAC) Between '7458' And '7461' Or (GL_ReportTransition.MAC)='8101' Or " & _
+             "(GL_ReportTransition.MAC) Between '8103' And '8105' Or (GL_ReportTransition.MAC) Between '8201' " & _
+             "And '8403') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS Expr1, 'Other' AS " & _
+             "Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC)='7180') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+ 
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS " & _
+             "Expr1, 'Marketing & Distribution' AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC)='7401' Or (GL_ReportTransition.MAC) Between '7480' And '7482' Or " & _
+             "(GL_ReportTransition.MAC) Between '7452' And '7457' Or (GL_ReportTransition.MAC)='7415' Or " & _
+             "(GL_ReportTransition.MAC)='7462' Or (GL_ReportTransition.MAC)='8102' Or (GL_ReportTransition.MAC)='6745' " & _
+             "Or (GL_ReportTransition.MAC) Between '7177' And '7179') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") " & _
+             "AND ((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+ 
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS " & _
+             "Expr1, 'Advertising & Promotion' AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC)='7141' Or (GL_ReportTransition.MAC)='7405' Or " & _
+             "(GL_ReportTransition.MAC)='7407' Or (GL_ReportTransition.MAC)='7408' Or (GL_ReportTransition.MAC)='7409' " & _
+             "Or (GL_ReportTransition.MAC)='7463' Or (GL_ReportTransition.MAC)='7410') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+ 
+    ' Used, as a placeholder, if R & D is not applicable to CBI
+    
+    Set DB = CurrentDb()
+    Set RS = DB.OpenRecordset("tbl_IS_RalCorp_Format", DB_OPEN_DYNASET)
+    RS.AddNew
+    RS.Fields("Account").Value = "0000-00-00-00-000001"
+    RS.Fields("Description").Value = "R & D"
+    RS.Fields("MAC").Value = "0002"
+    RS.Update
+    RS.Close
+    DB.Close
+    
+    ' Used if Interdivision Sales is applicable to CBI
+    
+    'strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriod & ", 'R & D' AS Expr1, " & _
+             "GL_ReportTransition.MAC " & _
+             "GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC)='') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    'DoCmd.RunSQL strSQL
+ 
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS " & _
+             "Expr1, 'Administrative' AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC)='6750' Or (GL_ReportTransition.MAC)='7140' Or " & _
+             "(GL_ReportTransition.MAC)='9201') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+ 
+    strSQL = "INSERT INTO tbl_IS_RalCorp_Format ( Account, CurrentActual, Description, MAC ) " & _
+             "SELECT GL_ReportTransition.Account, GL_ReportTransition." & strPeriodNew & " AS " & _
+             "Expr1, 'Other (Inc)/Exp' AS Expr2, GL_ReportTransition.MAC " & _
+             "FROM GL_ReportTransition " & _
+             "WHERE (((GL_ReportTransition.MAC)='7420' Or (GL_ReportTransition.MAC)='7148' Or " & _
+             "(GL_ReportTransition.MAC)='7149' Or (GL_ReportTransition.MAC) Between '9102' And '9109' Or " & _
+             "(GL_ReportTransition.MAC)='9301') AND " & _
+             "((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+
+'================================================================================================================
+'                                        CURRENT BUDGET
+
+    strSQL = "UPDATE dbo_tbl_Next_FY_Projection INNER JOIN tbl_IS_RalCorp_Format ON dbo_tbl_Next_FY_Projection.Account = " & _
+             "tbl_IS_RalCorp_Format.Account SET tbl_IS_RalCorp_Format.CurrentBudget = [dbo_tbl_Next_FY_Projection]![" & strPeriodNew & "] " & _
+             "WHERE (((dbo_tbl_Next_FY_Projection.FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+             "((dbo_tbl_Next_FY_Projection.ABCode)='Budget'));"
+    DoCmd.RunSQL strSQL
+        
+'================================================================================================================
+'                                        CURRENT PRIOR YEAR
+    
+    strSQL = "UPDATE GL_ReportTransition INNER JOIN tbl_IS_RalCorp_Format ON GL_ReportTransition.Account = " & _
+             "tbl_IS_RalCorp_Format.Account SET tbl_IS_RalCorp_Format.CurrentPrior = [GL_ReportTransition]![" & strPeriodNew & "] " & _
+             "WHERE (((GL_ReportTransition.FiscalYear)=" & strQuote & strLY & strQuote & ") AND " & _
+             "((GL_ReportTransition.ABCode)='Actual'));"
+    DoCmd.RunSQL strSQL
+    
+' ===============================================================================================================
+'                                        MISC. CALCULATIONS
+        
+    ' Limits values to thousands and millions
+    
+    strSQL = "UPDATE tbl_IS_RalCorp_Format SET tbl_IS_RalCorp_Format.CurrentActual = [CurrentActual]/1000, " & _
+             "tbl_IS_RalCorp_Format.CurrentBudget = [CurrentBudget]/1000, tbl_IS_RalCorp_Format.CurrentPrior = " & _
+             "[CurrentPrior]/1000;"
+    DoCmd.RunSQL strSQL
+       
+End Function

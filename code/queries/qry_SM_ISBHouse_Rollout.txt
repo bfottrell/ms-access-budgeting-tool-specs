@@ -1,0 +1,44 @@
+INSERT INTO
+    tbl_SM_ISBHouse_Rollout (
+        Region,
+        AccountDesc,
+        SumOfBC,
+        SumOfCEI,
+        SumOfOCI,
+        SumOfRGP,
+        SumOfFS,
+        SumOfBMM,
+        SumOfLOCI,
+        SumOfCS,
+        SumOfSF,
+        SumOfDev,
+        SumOfUD,
+        SumOfPR,
+        SumOfSalesTD,
+        SumOfTotalTD
+    )
+SELECT
+    tbl_SM_SyscoHouse_Rollout.Region,
+    tbl_SM_SyscoHouse_Rollout.AccountDesc,
+    Sum(tbl_SM_SyscoHouse_Rollout.BC) AS SumOfBC,
+    Sum(tbl_SM_SyscoHouse_Rollout.CEI) AS SumOfCEI,
+    Sum(tbl_SM_SyscoHouse_Rollout.OCI) AS SumOfOCI,
+    Sum(tbl_SM_SyscoHouse_Rollout.RGP) AS SumOfRGP,
+    Sum(tbl_SM_SyscoHouse_Rollout.FS) AS SumOfFS,
+    Sum(tbl_SM_SyscoHouse_Rollout.BMM) AS SumOfBMM,
+    Sum(tbl_SM_SyscoHouse_Rollout.LOCI) AS SumOfLOCI,
+    Sum(tbl_SM_SyscoHouse_Rollout.CS) AS SumOfCS,
+    Sum(tbl_SM_SyscoHouse_Rollout.SF) AS SumOfSF,
+    Sum(tbl_SM_SyscoHouse_Rollout.Dev) AS SumOfDev,
+    Sum(tbl_SM_SyscoHouse_Rollout.UD) AS SumOfUD,
+    Sum(tbl_SM_SyscoHouse_Rollout.PR) AS SumOfPR,
+    Sum(tbl_SM_SyscoHouse_Rollout.SalesTD) AS SumOfSalesTD,
+    Sum(tbl_SM_SyscoHouse_Rollout.TotalTD) AS SumOfTotalTD
+FROM
+    tbl_SM_SyscoHouse_Rollout
+GROUP BY
+    tbl_SM_SyscoHouse_Rollout.Region,
+    tbl_SM_SyscoHouse_Rollout.AccountDesc
+ORDER BY
+    tbl_SM_SyscoHouse_Rollout.Region,
+    tbl_SM_SyscoHouse_Rollout.AccountDesc;

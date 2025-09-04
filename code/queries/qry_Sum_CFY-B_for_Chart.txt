@@ -1,0 +1,4 @@
+SELECT GL_ReportTransition.RollupCode, Sum(GL_ReportTransition.AnnualSum) AS SumOfAnnualSum
+FROM GL_ReportTransition
+GROUP BY GL_ReportTransition.RollupCode, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode
+HAVING ((Not (GL_ReportTransition.RollupCode)="Sales") And ((GL_ReportTransition.FiscalYear)=Forms!Switchboard!cmbFY) And ((GL_ReportTransition.ABCode)='Budget'));

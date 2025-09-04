@@ -1,0 +1,9 @@
+SELECT
+    tbl_CostCenters.IDX,
+    Trim([UseFlag]) AS UseFlagTrim,
+    Trim([CC]) AS CCTrim,
+    Trim([CCMgr]) AS CCMgrTrim
+FROM
+    tbl_CostCenters
+ORDER BY
+    Trim([CC]);

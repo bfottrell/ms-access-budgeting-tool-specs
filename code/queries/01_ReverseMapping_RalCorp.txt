@@ -1,0 +1,21 @@
+SELECT
+    tbl_IS_RalCorp_Format.Account,
+    GL_ReportTransition.AccountDesc,
+    tbl_IS_RalCorp_Format.Description,
+    tbl_IS_RalCorp_Format.MAC,
+    tbl_IS_RalCorp_Format.CurrentBudget,
+    tbl_IS_RalCorp_Format.CurrentPrior
+FROM
+    tbl_IS_RalCorp_Format
+    INNER JOIN GL_ReportTransition ON tbl_IS_RalCorp_Format.Account = GL_ReportTransition.Account
+WHERE
+    (((GL_ReportTransition.FiscalYear) = "2007"))
+GROUP BY
+    tbl_IS_RalCorp_Format.Account,
+    GL_ReportTransition.AccountDesc,
+    tbl_IS_RalCorp_Format.Description,
+    tbl_IS_RalCorp_Format.MAC,
+    tbl_IS_RalCorp_Format.CurrentBudget,
+    tbl_IS_RalCorp_Format.CurrentPrior
+ORDER BY
+    tbl_IS_RalCorp_Format.Description;

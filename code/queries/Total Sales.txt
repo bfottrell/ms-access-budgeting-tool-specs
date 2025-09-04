@@ -1,0 +1,28 @@
+SELECT
+    GL_ReportTransition.FiscalYear,
+    GL_ReportTransition.ABCode,
+    GL_ReportTransition.RollupCode,
+    Sum(GL_ReportTransition.Period1) AS SumOfPeriod1,
+    Sum(GL_ReportTransition.Period2) AS SumOfPeriod2,
+    Sum(GL_ReportTransition.Period3) AS SumOfPeriod3,
+    Sum(GL_ReportTransition.Period4) AS SumOfPeriod4,
+    Sum(GL_ReportTransition.Period5) AS SumOfPeriod5,
+    Sum(GL_ReportTransition.Period6) AS SumOfPeriod6,
+    Sum(GL_ReportTransition.Period7) AS SumOfPeriod7,
+    Sum(GL_ReportTransition.Period8) AS SumOfPeriod8,
+    Sum(GL_ReportTransition.Period9) AS SumOfPeriod9,
+    Sum(GL_ReportTransition.Period10) AS SumOfPeriod10,
+    Sum(GL_ReportTransition.Period11) AS SumOfPeriod11,
+    Sum(GL_ReportTransition.Period12) AS SumOfPeriod12,
+    Sum(GL_ReportTransition.AnnualSum) AS SumOfAnnualSum
+FROM
+    GL_ReportTransition
+GROUP BY
+    GL_ReportTransition.FiscalYear,
+    GL_ReportTransition.ABCode,
+    GL_ReportTransition.RollupCode
+HAVING
+    (((GL_ReportTransition.RollupCode) = "Sales"))
+ORDER BY
+    GL_ReportTransition.FiscalYear DESC,
+    GL_ReportTransition.ABCode;

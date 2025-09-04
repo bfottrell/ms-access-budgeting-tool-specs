@@ -1,0 +1,3185 @@
+Dim DB As Database
+Dim RS1 As Recordset
+Dim RS2 As Recordset
+Dim RS3 As Recordset
+Dim RS4 As Recordset
+Dim strAccount As String
+Dim strAccountDesc As String
+Dim strRemainder As String
+Dim strPeriod As String
+Dim strPeriodS As String
+Dim strPeriodE As String
+Dim strPeriodTest As String
+Dim curPeriod As Currency
+Dim curSPeriod As Currency
+Dim strFY As String
+Dim strQuote As String * 1
+Dim strApost As String * 1
+Dim strSQL As String
+
+Option Compare Database
+Option Explicit
+
+Function SyscoHousePT1()
+
+    strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.* " & _
+             "FROM tbl_SM_SyscoHouse_Rollout;"
+    DoCmd.RunSQL strSQL
+        
+    strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+    strPeriodE = Forms!Switchboard!cmbEPeriod.Value
+    strFY = Forms!Switchboard!cmbFY.Value
+    strQuote = Chr(34)
+        
+Set DB = CurrentDb()
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7401-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+        
+Set RS2 = DB.OpenRecordset("tbl_SM_SyscoHouse_Rollout", DB_OPEN_DYNASET)
+
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BC").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BC").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7402-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CEI").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CEI").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7403-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("OCI").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("OCI").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7404-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("RGP").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("RGP").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7405-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("FS").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("FS").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+        
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7407-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BMM").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BMM").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+
+Call SyscoHousePT2
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function SyscoHousePT2()
+            
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7408-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("LOCI").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("LOCI").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7409-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CS").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CS").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7410-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("SF").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("SF").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7411-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 17)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("Dev").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 17)
+            
+            If strPeriod = "Period1" Then
+                curPeriod = RS1.Fields("Period1").Value
+            Else
+            End If
+            
+            If strPeriod = "Period2" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value
+            Else
+            End If
+                    
+            If strPeriod = "Period3" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period4" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period5" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period6" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period7" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period8" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period9" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period10" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value + RS1.Fields("Period10").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period11" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value + RS1.Fields("Period10").Value + RS1.Fields("Period11").Value
+            Else
+            End If
+            
+            If strPeriod = "Period12" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value + RS1.Fields("Period10").Value + RS1.Fields("Period11").Value + RS1.Fields("Period12").Value
+            Else
+            End If
+            
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("Dev").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        End If
+        
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7414-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("UD").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("UD").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7420-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!frm_SM_SyscoHouse_Rollout!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("PR").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("PR").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+Call SyscoHouseCleanUp
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function SyscoHouse_By_House_PT1()
+
+    strSQL = "DELETE tbl_SM_SyscoHouse_By_House.* " & _
+        "FROM tbl_SM_SyscoHouse_By_House;"
+        
+    DoCmd.RunSQL strSQL
+        
+    strFY = Forms!frm_SM_SyscoHouse_by_House!cmbFY.Value
+    strQuote = Chr(34)
+        
+Set DB = CurrentDb()
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7401-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+        
+Set RS2 = DB.OpenRecordset("tbl_SM_SyscoHouse_By_House", DB_OPEN_DYNASET)
+
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+        
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 24)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Fields("BC").Value = RS1.Fields("Period1").Value
+        RS2.Update
+        RS1.MoveNext
+            
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7402-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 25)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Fields("CEI").Value = curPeriod
+        RS2.Update
+        RS1.MoveNext
+          
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7403-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+        
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 26)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7404-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 27)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7405-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 16)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+        
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7407-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 23)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+
+Call SyscoHouse_By_House_PT2
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function SyscoHouse_By_House_PT2()
+
+    strSQL = "DELETE tbl_SM_SyscoHouse_By_House.* " & _
+        "FROM tbl_SM_SyscoHouse_By_House;"
+        
+    DoCmd.RunSQL strSQL
+        
+    strFY = Forms!frm_SM_SyscoHouse_by_House!cmbFY.Value
+    strQuote = Chr(34)
+        
+Set DB = CurrentDb()
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7408-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+        
+Set RS2 = DB.OpenRecordset("tbl_SM_SyscoHouse_By_House", DB_OPEN_DYNASET)
+
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 24)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7409-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 25)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+         
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7410-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 26)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7411-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 27)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7414-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 16)
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+        
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7420-*-S2-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ")) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+    
+        strAccount = RS1.Fields("Account").Value
+        strAccountDesc = RS1.Fields("AccountDesc").Value
+        strRemainder = Mid(strAccountDesc, 23)
+        curPeriod = RS1.Fields(strPeriod).Value
+        RS2.AddNew
+        RS2.Fields("Account").Value = strAccount
+        RS2.Fields("AccountDesc").Value = strRemainder
+        RS2.Fields("PR").Value = curPeriod
+        RS2.Update
+        RS1.MoveNext
+        
+    Loop
+    
+RS1.Close
+
+Call SyscoHouseByHouseCleanUp
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function SyscoHouseCleanUp()
+
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Midwest' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-RM-*'));"
+    
+    DoCmd.RunSQL strSQL
+
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Northeast' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-RN-*'));"
+    
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Southeast' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-RS-*'));"
+    
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Western' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-RW-*'));"
+    
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Corporate' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Not Like '*-RM-*' " & _
+        "And (tbl_SM_SyscoHouse_Rollout.Account) Not Like '*-RN-*' And " & _
+        "(tbl_SM_SyscoHouse_Rollout.Account) Not Like '*-RS-*' And " & _
+        "(tbl_SM_SyscoHouse_Rollout.Account) Not Like '*-RW-*'));"
+    
+    DoCmd.RunSQL strSQL
+    
+RS2.MoveFirst
+    
+    Do While Not RS2.EOF
+                    
+        strAccount = RS2.Fields("Account").Value
+        strRemainder = Mid(strAccount, 15)
+        RS2.Edit
+        RS2.Fields("Account").Value = strRemainder
+        RS2.Update
+        RS2.MoveNext
+          
+    Loop
+   
+Set RS3 = DB.OpenRecordset("SELECT AR1_CustomerMaster.CustomerNumber, " & _
+    "AR1_CustomerMaster.CustomerName " & _
+    "FROM AR1_CustomerMaster " & _
+    "WHERE (((AR1_CustomerMaster.CustomerNumber) Like 'SYS*')) " & _
+    "ORDER BY AR1_CustomerMaster.CustomerNumber;")
+    
+RS3.MoveFirst
+
+Do While Not RS3.EOF
+    
+    RS2.MoveFirst
+    
+    Do While Not RS2.EOF
+        
+        strAccount = RS2.Fields("Account").Value + " "
+        
+        If RS3.Fields("CustomerNumber").Value = strAccount Then
+            RS2.Edit
+            RS2.Fields("AccountDesc").Value = RS3.Fields("CustomerName").Value
+            RS2.Update
+            RS2.MoveNext
+        Else
+            RS2.MoveNext
+        End If
+
+    Loop
+
+    RS3.MoveNext
+    
+Loop
+    
+RS3.Close
+    
+RS2.MoveFirst
+  
+Set RS3 = DB.OpenRecordset("SELECT AR1_CustomerMaster.CustomerNumber, " & _
+    "AR1_CustomerMaster.CustomerName " & _
+    "FROM AR1_CustomerMaster " & _
+    "WHERE (((AR1_CustomerMaster.CustomerNumber) Like 'SYS*')) " & _
+    "ORDER BY AR1_CustomerMaster.CustomerNumber;")
+    
+RS3.MoveFirst
+
+Do While Not RS3.EOF
+    
+    RS2.MoveFirst
+    
+    Do While Not RS2.EOF
+        
+        strAccount = RS2.Fields("Account").Value + " "
+        
+        If RS3.Fields("CustomerNumber").Value = strAccount Then
+            RS2.Edit
+            RS2.Fields("AccountDesc").Value = RS3.Fields("CustomerName").Value
+            RS2.Update
+            RS2.MoveNext
+        Else
+            RS2.MoveNext
+        End If
+
+    Loop
+
+    RS3.MoveNext
+    
+Loop
+    
+RS2.Close
+RS3.Close
+    
+    strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Account " & _
+        "FROM tbl_SM_SyscoHouse_Rollout " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Not Like 'SYS*'));"
+    DoCmd.RunSQL strSQL
+    
+    If Forms!Switchboard!cmbRegion = "Midwest" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+            "FROM tbl_SM_SyscoHouse_Rollout " & _
+            "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Midwest'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+    
+    If Forms!Switchboard!cmbRegion = "Northeast" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+            "FROM tbl_SM_SyscoHouse_Rollout " & _
+            "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Northeast'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+    
+    If Forms!Switchboard!cmbRegion = "Southeast" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+            "FROM tbl_SM_SyscoHouse_Rollout " & _
+            "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Southeast'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+    
+    If Forms!Switchboard!cmbRegion = "Western" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+            "FROM tbl_SM_SyscoHouse_Rollout " & _
+            "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Western'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period1 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period1) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period2 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period2) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period3 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period3) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period4 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period4) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period5 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period5) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period6 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period6) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period7 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period7) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period8 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period8) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period9 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period9) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period10 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period10) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period11 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period11) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period12 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period12) Is Null));"
+    DoCmd.RunSQL strSQL
+
+Set RS1 = DB.OpenRecordset("SELECT tbl_SalesFiscal.CustomerNumber, tbl_SalesFiscal.CalYear, Sum(tbl_SalesFiscal.Period1) AS SumOfPeriod1, Sum(tbl_SalesFiscal.Period2) AS SumOfPeriod2, Sum(tbl_SalesFiscal.Period3) AS SumOfPeriod3, Sum(tbl_SalesFiscal.Period4) AS SumOfPeriod4, Sum(tbl_SalesFiscal.Period5) AS SumOfPeriod5, Sum(tbl_SalesFiscal.Period6) AS SumOfPeriod6, Sum(tbl_SalesFiscal.Period7) AS SumOfPeriod7, Sum(tbl_SalesFiscal.Period8) AS SumOfPeriod8, Sum(tbl_SalesFiscal.Period9) AS SumOfPeriod9, Sum(tbl_SalesFiscal.Period10) AS SumOfPeriod10, Sum(tbl_SalesFiscal.Period11) AS SumOfPeriod11, Sum(tbl_SalesFiscal.Period12) AS SumOfPeriod12 " & _
+    "FROM tbl_SalesFiscal " & _
+    "GROUP BY tbl_SalesFiscal.CustomerNumber, tbl_SalesFiscal.CalYear " & _
+    "HAVING (((tbl_SalesFiscal.CalYear)Like " & strQuote & strFY & strQuote & "));")
+        
+Set RS2 = DB.OpenRecordset("tbl_SM_SyscoHouse_Rollout", DB_OPEN_DYNASET)
+
+strPeriodS = "SumOf" & strPeriodS
+strPeriodE = "SumOf" & strPeriodE
+
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+    
+        If RS2.EOF Then
+            Exit Do
+        Else
+        End If
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            
+        Do While Not RS2.EOF
+            
+            Do While Not RS1.EOF
+            
+            If RS1.EOF Then
+                RS2.MoveNext
+                RS1.MoveFirst
+                Exit Do
+            Else
+            End If
+            
+            strAccount = RS1.Fields("CustomerNumber").Value
+            strAccount = Trim(strAccount)
+            
+            If RS2.EOF Then
+                Exit Do
+            Else
+            End If
+            
+            If strAccount = RS2.Fields("Account").Value Then
+                curPeriod = RS1.Fields(strPeriodS).Value
+                RS2.Edit
+                RS2.Fields("SalesTD").Value = curPeriod
+                RS2.Update
+                RS2.MoveNext
+                RS1.MoveFirst
+            Else
+                RS1.MoveNext
+            End If
+            
+            Loop
+            
+            If RS1.EOF Then
+                RS2.MoveNext
+                RS1.MoveFirst
+                Exit Do
+            Else
+            End If
+                        
+    Loop
+            
+        Else
+            
+            Do While Not RS2.EOF
+            
+            strAccount = RS1.Fields("CustomerNumber").Value
+            strAccount = Trim(strAccount)
+            
+            If RS2.EOF Then
+                Exit Do
+            Else
+            End If
+            
+            If strAccount = RS2.Fields("Account").Value Then
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+                        
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "SumOfPeriod" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 12, 15)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.Edit
+            RS2.Fields("SalesTD").Value = curPeriod
+            RS2.Update
+            strPeriodS = "SumOf" & Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+                            
+            Else
+                RS1.MoveNext
+            End If
+                        
+            If RS1.EOF Then
+                RS2.MoveNext
+                RS1.MoveFirst
+                Exit Do
+            Else
+            End If
+           
+           Loop
+           
+           End If
+           
+    Loop
+   
+RS1.Close
+RS2.Close
+
+Set RS2 = DB.OpenRecordset("tbl_SM_SyscoHouse_Rollout", DB_OPEN_DYNASET)
+
+RS2.MoveFirst
+
+    Do While Not RS2.EOF
+    
+        strAccount = RS2.Fields("Account").Value
+        RS2.MoveNext
+        
+        If RS2.EOF Then
+            Exit Do
+        Else
+        End If
+        
+        If RS2.Fields("Account").Value = strAccount Then
+            RS2.Edit
+            RS2.Fields("SalesTD").Value = 0
+            RS2.Update
+        Else
+            'RS2.MoveNext
+        End If
+    
+    Loop
+
+End Function
+Function SyscoHouseByHouseCleanUp()
+
+    strSQL = "UPDATE tbl_SM_SyscoHouse_By_House " & _
+        "SET tbl_SM_SyscoHouse_By_House.Region = 'Midwest' " & _
+        "WHERE (((tbl_SM_SyscoHouse_By_House.Account) Like '*-RM-*'));"
+    DoCmd.RunSQL strSQL
+
+    strSQL = "UPDATE tbl_SM_SyscoHouse_By_House " & _
+        "SET tbl_SM_SyscoHouse_By_House.Region = 'Northeast' " & _
+        "WHERE (((tbl_SM_SyscoHouse_By_House.Account) Like '*-RN-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_By_House " & _
+        "SET tbl_SM_SyscoHouse_By_House.Region = 'Southeast' " & _
+        "WHERE (((tbl_SM_SyscoHouse_By_House.Account) Like '*-RS-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_By_House " & _
+        "SET tbl_SM_SyscoHouse_By_House.Region = 'Western' " & _
+        "WHERE (((tbl_SM_SyscoHouse_By_House.Account) Like '*-RW-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_By_House " & _
+        "SET tbl_SM_SyscoHouse_By_House.Region = 'Corporate' " & _
+        "WHERE (((tbl_SM_SyscoHouse_By_House.Account) Not Like '*-RM-*' " & _
+        "And (tbl_SM_SyscoHouse_By_House.Account) Not Like '*-RN-*' And " & _
+        "(tbl_SM_SyscoHouse_By_House.Account) Not Like '*-RS-*' And " & _
+        "(tbl_SM_SyscoHouse_By_House.Account) Not Like '*-RW-*'));"
+    DoCmd.RunSQL strSQL
+    
+RS2.MoveFirst
+    
+    Do While Not RS2.EOF
+                    
+        strAccount = RS2.Fields("Account").Value
+        strRemainder = Mid(strAccount, 15)
+        RS2.Edit
+        RS2.Fields("Account").Value = strRemainder
+        RS2.Update
+        RS2.MoveNext
+          
+    Loop
+   
+Set RS3 = DB.OpenRecordset("SELECT AR1_CustomerMaster.CustomerNumber, " & _
+    "AR1_CustomerMaster.CustomerName " & _
+    "FROM AR1_CustomerMaster " & _
+    "WHERE (((AR1_CustomerMaster.CustomerNumber) Like 'SYS*')) " & _
+    "ORDER BY AR1_CustomerMaster.CustomerNumber;")
+    
+RS3.MoveFirst
+
+Do While Not RS3.EOF
+    
+    RS2.MoveFirst
+    
+    Do While Not RS2.EOF
+        
+        strAccount = RS2.Fields("Account").Value + " "
+        
+        If RS3.Fields("CustomerNumber").Value = strAccount Then
+            RS2.Edit
+            RS2.Fields("AccountDesc").Value = RS3.Fields("CustomerName").Value
+            RS2.Update
+            RS2.MoveNext
+        Else
+            RS2.MoveNext
+        End If
+
+    Loop
+
+    RS3.MoveNext
+    
+Loop
+    
+RS3.Close
+    
+RS2.MoveFirst
+   
+Set RS3 = DB.OpenRecordset("SELECT AR1_CustomerMaster.CustomerNumber, " & _
+    "AR1_CustomerMaster.CustomerName " & _
+    "FROM AR1_CustomerMaster " & _
+    "WHERE (((AR1_CustomerMaster.CustomerNumber) Like 'SYS*')) " & _
+    "ORDER BY AR1_CustomerMaster.CustomerNumber;")
+    
+RS3.MoveFirst
+
+Do While Not RS3.EOF
+    
+    RS2.MoveFirst
+    
+    Do While Not RS2.EOF
+        
+        strAccount = RS2.Fields("Account").Value + " "
+        
+        If RS3.Fields("CustomerNumber").Value = strAccount Then
+            RS2.Edit
+            RS2.Fields("AccountDesc").Value = RS3.Fields("CustomerName").Value
+            RS2.Update
+            RS2.MoveNext
+        Else
+            RS2.MoveNext
+        End If
+
+    Loop
+
+    RS3.MoveNext
+    
+Loop
+    
+RS2.Close
+RS3.Close
+    
+    strSQL = "DELETE tbl_SM_SyscoHouse_By_House.Account " & _
+        "FROM tbl_SM_SyscoHouse_By_House " & _
+        "WHERE (((tbl_SM_SyscoHouse_By_House.Account) Not Like 'SYS*'));"
+    DoCmd.RunSQL strSQL
+    
+    If Forms!frm_SM_SyscoHouse_by_House!cmbRegion = "Midwest" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_By_House.Region " & _
+            "FROM tbl_SM_SyscoHouse_By_House " & _
+            "WHERE (((tbl_SM_SyscoHouse_By_House.Region) Not Like 'Midwest'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+    
+    If Forms!frm_SM_SyscoHouse_by_House!cmbRegion = "Northeast" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_By_House.Region " & _
+            "FROM tbl_SM_SyscoHouse_By_House " & _
+            "WHERE (((tbl_SM_SyscoHouse_By_House.Region) Not Like 'Northeast'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+    
+    If Forms!frm_SM_SyscoHouse_by_House!cmbRegion = "Southeast" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_By_House.Region " & _
+            "FROM tbl_SM_SyscoHouse_By_House " & _
+            "WHERE (((tbl_SM_SyscoHouse_By_House.Region) Not Like 'Southeast'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+    
+    If Forms!frm_SM_SyscoHouse_by_House!cmbRegion = "Western" Then
+        strSQL = "DELETE tbl_SM_SyscoHouse_By_House.Region " & _
+            "FROM tbl_SM_SyscoHouse_By_House " & _
+            "WHERE (((tbl_SM_SyscoHouse_By_House.Region) Not Like 'Western'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function ISBHousePT1()
+
+    strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.* " & _
+        "FROM tbl_SM_SyscoHouse_Rollout;"
+        
+    DoCmd.RunSQL strSQL
+        
+    strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+    strPeriodE = Forms!Switchboard!cmbEPeriod.Value
+    strFY = Forms!Switchboard!cmbFY.Value
+    strQuote = Chr(34)
+        
+Set DB = CurrentDb()
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7401-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+        
+Set RS2 = DB.OpenRecordset("tbl_SM_SyscoHouse_Rollout", DB_OPEN_DYNASET)
+
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BC").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BC").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7402-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CEI").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CEI").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7403-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 26)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("OCI").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 26)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("OCI").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7404-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 27)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("RGP").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 27)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("RGP").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7405-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 16)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("FS").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 16)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("FS").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+        
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7407-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 23)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BMM").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 23)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("BMM").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+
+Call ISBHousePT2
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function ISBHousePT2()
+            
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7408-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 27)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("LOCI").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 27)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("LOCI").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7409-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 14)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CS").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 14)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("CS").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7410-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 22)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("SF").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 22)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("SF").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7411-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 17)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("Dev").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 17)
+            
+            If strPeriod = "Period1" Then
+                curPeriod = RS1.Fields("Period1").Value
+            Else
+            End If
+            
+            If strPeriod = "Period2" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value
+            Else
+            End If
+                    
+            If strPeriod = "Period3" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period4" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period5" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period6" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period7" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period8" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period9" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period10" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value + RS1.Fields("Period10").Value
+            Else
+            End If
+                   
+            If strPeriod = "Period11" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value + RS1.Fields("Period10").Value + RS1.Fields("Period11").Value
+            Else
+            End If
+            
+            If strPeriod = "Period12" Then
+                curPeriod = RS1.Fields("Period1").Value + RS1.Fields("Period2").Value + RS1.Fields("Period3").Value + RS1.Fields("Period4").Value + RS1.Fields("Period5").Value + RS1.Fields("Period6").Value + RS1.Fields("Period7").Value + RS1.Fields("Period8").Value + RS1.Fields("Period9").Value + RS1.Fields("Period10").Value + RS1.Fields("Period11").Value + RS1.Fields("Period12").Value
+            Else
+            End If
+            
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("Dev").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        End If
+        
+    Loop
+    
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7414-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("UD").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("UD").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+    
+Set RS1 = DB.OpenRecordset("SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, GL_ReportTransition.Period12 " & _
+    "FROM GL_ReportTransition " & _
+    "WHERE (((GL_ReportTransition.Account) Like '7420-*-S1-*-*') AND ((GL_ReportTransition.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((GL_ReportTransition.ABCode)='Actual')) " & _
+    "ORDER BY GL_ReportTransition.Account;")
+    
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+
+    Do While Not RS1.EOF
+                    
+        If Forms!frm_SM_SyscoHouse_Rollout!chkYTD.Value = False Then
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+            curPeriod = RS1.Fields(strPeriodS).Value
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("PR").Value = curPeriod
+            RS2.Update
+            RS1.MoveNext
+        Else
+            strAccount = RS1.Fields("Account").Value
+            strAccountDesc = RS1.Fields("AccountDesc").Value
+            strRemainder = Mid(strAccountDesc, 24)
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+            strPeriodS = strPeriodS + 1
+            
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "Period" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 7, 8)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.AddNew
+            RS2.Fields("Account").Value = strAccount
+            RS2.Fields("AccountDesc").Value = strRemainder
+            RS2.Fields("PR").Value = curPeriod
+            RS2.Update
+            strPeriodS = Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+        End If
+        
+    Loop
+   
+RS1.Close
+
+Call ISBHouseCleanUp
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function ISBHouseCleanUp()
+
+    strApost = Chr(96)
+
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Safeway' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1A-*'));"
+    DoCmd.RunSQL strSQL
+
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Albertsons' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1B-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Costco' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1C-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Kroger' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1D-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'HEB' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1E-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Raleys' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1F-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Harris Teeter' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1G-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Marsh' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1H-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Roundys' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1I-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'WinCo' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1J-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Misc ISB Dist.' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1K-*'));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SM_SyscoHouse_Rollout " & _
+        "SET tbl_SM_SyscoHouse_Rollout.Region = 'Robb Ross' " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Like '*-1L-*'));"
+    DoCmd.RunSQL strSQL
+            
+    strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+        "FROM tbl_SM_SyscoHouse_Rollout " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Is Null));"
+    DoCmd.RunSQL strSQL
+        
+    strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Account " & _
+        "FROM tbl_SM_SyscoHouse_Rollout " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Account) Not Like '*000000'));"
+    DoCmd.RunSQL strSQL
+            
+RS2.MoveFirst
+        
+    If Forms!Switchboard!cmbCustomer = "All" Then
+    Else
+        If Forms!Switchboard!cmbCustomer = "Safeway" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Safeway'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "Albertsons" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Albertsons'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+            
+        If Forms!Switchboard!cmbCustomer = "Costco" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Costco'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+            
+        If Forms!Switchboard!cmbCustomer = "Kroger" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Kroger'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "HEB" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'HEB'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "Raley's" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Raleys'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "Harris Teeter" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Harris Teeter'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "Marsh" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Marsh'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "Roundy's" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Roundys'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "WinCo" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'WinCo'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "Misc ISB Dist." Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Misc ISB Dist.'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+        
+        If Forms!Switchboard!cmbCustomer = "Robb Ross" Then
+            strSQL = "DELETE tbl_SM_SyscoHouse_Rollout.Region " & _
+                "FROM tbl_SM_SyscoHouse_Rollout " & _
+                "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Not Like 'Robb Ross'));"
+            DoCmd.RunSQL strSQL
+        Else
+        End If
+    End If
+        
+    strSQL = "Delete tbl_SM_SyscoHouse_Rollout.Region " & _
+        "FROM tbl_SM_SyscoHouse_Rollout " & _
+        "WHERE (((tbl_SM_SyscoHouse_Rollout.Region) Is Null));"
+    DoCmd.RunSQL strSQL
+            
+    strSQL = "DELETE tbl_SalesFiscal.CalYear " & _
+        "FROM tbl_SalesFiscal " & _
+        "WHERE ((Not (tbl_SalesFiscal.CalYear)=Forms!Switchboard!cmbFY));"
+    DoCmd.RunSQL strSQL
+                
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period1 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period1) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period2 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period2) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period3 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period3) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period4 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period4) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period5 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period5) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period6 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period6) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period7 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period7) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period8 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period8) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period9 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period9) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period10 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period10) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period11 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period11) Is Null));"
+    DoCmd.RunSQL strSQL
+    
+    strSQL = "UPDATE tbl_SalesFiscal SET tbl_SalesFiscal.Period12 = 0 " & _
+        "WHERE (((tbl_SalesFiscal.Period12) Is Null));"
+    DoCmd.RunSQL strSQL
+
+    strSQL = "DELETE tbl_SM_ISBHouse_Rollout.* " & _
+        "FROM tbl_SM_ISBHouse_Rollout;"
+    DoCmd.RunSQL strSQL
+    
+    DoCmd.OpenQuery "qry_SM_ISBHouse_Rollout"
+    
+
+Set RS1 = DB.OpenRecordset("SELECT tbl_SalesFiscal.CustomerNumber, tbl_SalesFiscal.CalYear, Sum(tbl_SalesFiscal.Period1) AS SumOfPeriod1, Sum(tbl_SalesFiscal.Period2) AS SumOfPeriod2, Sum(tbl_SalesFiscal.Period3) AS SumOfPeriod3, Sum(tbl_SalesFiscal.Period4) AS SumOfPeriod4, Sum(tbl_SalesFiscal.Period5) AS SumOfPeriod5, Sum(tbl_SalesFiscal.Period6) AS SumOfPeriod6, Sum(tbl_SalesFiscal.Period7) AS SumOfPeriod7, Sum(tbl_SalesFiscal.Period8) AS SumOfPeriod8, Sum(tbl_SalesFiscal.Period9) AS SumOfPeriod9, Sum(tbl_SalesFiscal.Period10) AS SumOfPeriod10, Sum(tbl_SalesFiscal.Period11) AS SumOfPeriod11, Sum(tbl_SalesFiscal.Period12) AS SumOfPeriod12 " & _
+    "FROM tbl_SalesFiscal " & _
+    "GROUP BY tbl_SalesFiscal.CustomerNumber, tbl_SalesFiscal.CalYear " & _
+    "HAVING (((tbl_SalesFiscal.CalYear)Like " & strQuote & strFY & strQuote & "));")
+        
+Set RS2 = DB.OpenRecordset("tbl_SM_ISBHouse_Rollout", DB_OPEN_DYNASET)
+
+RS2.MoveFirst
+
+    strSQL = "DELETE tbl_SalesFiscal.CustomerNumber " & _
+        "FROM tbl_SalesFiscal " & _
+        "WHERE (((tbl_SalesFiscal.CustomerNumber) Like 'SYSM*' Or (tbl_SalesFiscal.CustomerNumber) " & _
+        "Like 'SYSN*' Or (tbl_SalesFiscal.CustomerNumber) Like 'SYSS*' Or (tbl_SalesFiscal.CustomerNumber) Like 'SYSW*'));"
+    DoCmd.RunSQL strSQL
+        
+    Do Until RS2.EOF
+    
+        strAccount = RS2.Fields("CustomerNumber").Value
+        strRemainder = Left(strAccount, 3)
+        RS2.Edit
+        RS2.Fields("CustomerNumber").Value = strRemainder
+        RS2.Update
+        RS2.MoveNext
+        
+    Loop
+
+strPeriodS = "SumOf" & strPeriodS
+strPeriodE = "SumOf" & strPeriodE
+
+    If RS1.EOF Then
+    Else
+        RS1.MoveFirst
+    End If
+    
+    Do While Not RS1.EOF
+    
+        If RS2.EOF Then
+            Exit Do
+        Else
+        End If
+                    
+        If Forms!Switchboard!chkYTD.Value = False Then
+            
+        Do While Not RS2.EOF
+            
+            Do While Not RS1.EOF
+            
+            If RS1.EOF Then
+                RS2.MoveNext
+                RS1.MoveFirst
+                Exit Do
+            Else
+            End If
+            
+            strAccount = RS1.Fields("CustomerNumber").Value
+            strAccount = Trim(strAccount)
+            
+            If RS2.EOF Then
+                Exit Do
+            Else
+            End If
+            
+            If strAccount = RS2.Fields("Region").Value Then
+                curPeriod = RS1.Fields(strPeriodS).Value
+                RS2.Edit
+                RS2.Fields("SalesTD").Value = curPeriod
+                RS2.Update
+                RS2.MoveNext
+                RS1.MoveFirst
+            Else
+                RS1.MoveNext
+            End If
+            
+            Loop
+            
+            If RS1.EOF Then
+                RS2.MoveNext
+                RS1.MoveFirst
+                Exit Do
+            Else
+            End If
+                        
+    Loop
+            
+        Else
+            
+            Do While Not RS2.EOF
+            
+            strAccount = RS1.Fields("CustomerNumber").Value
+            strAccount = Trim(strAccount)
+            
+            If RS2.EOF Then
+                Exit Do
+            Else
+            End If
+            
+            If strAccount = RS2.Fields("Account").Value Then
+                        
+            curPeriod = RS1.Fields(strPeriodS).Value
+            strPeriodS = Mid(Forms!Switchboard!cmbSPeriod.Value, 7, 8)
+            strPeriodE = Mid(Forms!Switchboard!cmbEPeriod.Value, 7, 8)
+                        
+            Do While strPeriodS <> strPeriodE + 1
+                
+                strPeriodS = "SumOfPeriod" & strPeriodS
+                curPeriod = curPeriod + RS1.Fields(strPeriodS).Value
+                strPeriodS = Mid(strPeriodS, 12, 15)
+                strPeriodS = Trim(strPeriodS)
+                strPeriodS = strPeriodS + 1
+                
+            Loop
+                                     
+            RS2.Edit
+            RS2.Fields("SalesTD").Value = curPeriod
+            RS2.Update
+            strPeriodS = "SumOf" & Forms!Switchboard!cmbSPeriod.Value
+            RS1.MoveNext
+                            
+            Else
+                RS1.MoveNext
+            End If
+                        
+            If RS1.EOF Then
+                RS2.MoveNext
+                RS1.MoveFirst
+                Exit Do
+            Else
+            End If
+           
+           Loop
+           
+           End If
+           
+    Loop
+   
+RS1.Close
+RS2.Close
+
+Set RS2 = DB.OpenRecordset("tbl_SM_SyscoHouse_Rollout", DB_OPEN_DYNASET)
+
+RS2.MoveFirst
+
+    Do While Not RS2.EOF
+    
+        strAccount = RS2.Fields("Account").Value
+        RS2.MoveNext
+        
+        If RS2.EOF Then
+            Exit Do
+        Else
+        End If
+        
+        If RS2.Fields("Account").Value = strAccount Then
+            RS2.Edit
+            RS2.Fields("SalesTD").Value = 0
+            RS2.Update
+        Else
+            'RS2.MoveNext
+        End If
+    
+    Loop
+
+End Function
+
+'____________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Function ForecastReport()
+
+Dim DB As Database
+Dim RS1 As Recordset
+Dim RS2 As Recordset
+Dim RS3 As Recordset
+Dim curP1 As Currency
+Dim curP2 As Currency
+Dim curP3 As Currency
+Dim curP4 As Currency
+Dim curP5 As Currency
+Dim curP6 As Currency
+Dim curP7 As Currency
+Dim curP8 As Currency
+Dim curP9 As Currency
+Dim curP10 As Currency
+Dim curP11 As Currency
+Dim curP12 As Currency
+Dim curSum As Currency
+Dim curLP1 As Currency
+Dim curLP2 As Currency
+Dim curLP3 As Currency
+Dim curLP4 As Currency
+Dim curLP5 As Currency
+Dim curLP6 As Currency
+Dim curLP7 As Currency
+Dim curLP8 As Currency
+Dim curLP9 As Currency
+Dim curLP10 As Currency
+Dim curLP11 As Currency
+Dim curLP12 As Currency
+Dim curLSum As Currency
+Dim sglP1 As Single
+Dim sglP2 As Single
+Dim sglP3 As Single
+Dim sglP4 As Single
+Dim sglP5 As Single
+Dim sglP6 As Single
+Dim sglP7 As Single
+Dim sglP8 As Single
+Dim sglP9 As Single
+Dim sglP10 As Single
+Dim sglP11 As Single
+Dim sglP12 As Single
+Dim sglSum As Single
+Dim stDocName As String
+Dim strCC As String
+Dim strSQL As String
+Dim strFY As String
+Dim strLY As String
+Dim strQuote As String * 1
+Dim strAccount As String
+
+Set DB = CurrentDb()
+Set RS1 = DB.OpenRecordset("SELECT [tbl_ReportingYear - Link].CFY, [tbl_ReportingYear - Link].NFY FROM [tbl_ReportingYear - Link];")
+
+    strFY = RS1.Fields("NFY").Value
+    strLY = RS1.Fields("CFY").Value
+    
+RS1.Close
+DB.Close
+
+    strCC = Forms!Switchboard!cmbCC.Value
+    'strFY = Forms!Switchboard!cmbFY.Value
+    'strLY = strFY - 1
+    strQuote = Chr(34)
+        
+' Clears data from tbl_Forecast_Report_Staging and reloads it with new
+' data based on the choice of a given Cost Center, or group of Cost Centers.
+    
+    strSQL = "DELETE tbl_ForecastStaging.* " & _
+             "FROM tbl_ForecastStaging;"
+    DoCmd.RunSQL strSQL
+        
+Set DB = CurrentDb()
+Set RS1 = DB.OpenRecordset("SELECT [dbo_tbl_Next_FY_Projection - Link].FiscalYear, [dbo_tbl_Next_FY_Projection - Link].Status " & _
+    "FROM [dbo_tbl_Next_FY_Projection - Link] " & _
+    "GROUP BY [dbo_tbl_Next_FY_Projection - Link].FiscalYear, [dbo_tbl_Next_FY_Projection - Link].Status " & _
+    "HAVING ((([dbo_tbl_Next_FY_Projection - Link].FiscalYear)=" & strQuote & strFY & strQuote & "));")
+    
+    If RS1.Fields("Status").Value = "O" Then
+    
+        If strCC = "All Cost Centers w/o Sales and Marketing" Then
+                
+            strSQL = "INSERT INTO tbl_ForecastStaging ( Account, AccountDesc, FiscalYear, ABCode, RollupCode, Period1, Period2, Period3, " & _
+                "Period4, Period5, Period6, Period7, Period8, Period9, Period10, Period11, Period12, AnnualSum ) " & _
+                "SELECT [dbo_tbl_Next_FY_Projection - Link].Account, [dbo_tbl_Next_FY_Projection - Link] - Link].AccountDesc, [dbo_tbl_Next_FY_Projection - Link].FiscalYear, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].ABCode, [dbo_tbl_Next_FY_Projection - Link] - Link].RollupCode, [dbo_tbl_Next_FY_Projection - Link].Period1, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period2, [dbo_tbl_Next_FY_Projection - Link].Period3, [dbo_tbl_Next_FY_Projection - Link].Period4, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period5, [dbo_tbl_Next_FY_Projection - Link].Period6, [dbo_tbl_Next_FY_Projection - Link].Period7, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period8, [dbo_tbl_Next_FY_Projection - Link].Period9, [dbo_tbl_Next_FY_Projection - Link].Period10, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period11, [dbo_tbl_Next_FY_Projection - Link].Period12, [dbo_tbl_Next_FY_Projection - Link].AnnualSum " & _
+                "FROM [dbo_tbl_Next_FY_Projection - Link] " & _
+                "WHERE ((([dbo_tbl_Next_FY_Projection - Link].FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+                "(([dbo_tbl_Next_FY_Projection - Link].ABCode)='Budget') AND (([dbo_tbl_Next_FY_Projection - Link].RollupCode)<>'Sales and Marketing'));"
+            DoCmd.RunSQL strSQL
+        Else
+            strSQL = "INSERT INTO tbl_ForecastStaging ( Account, AccountDesc, FiscalYear, ABCode, RollupCode, Period1, Period2, Period3, " & _
+                "Period4, Period5, Period6, Period7, Period8, Period9, Period10, Period11, Period12, AnnualSum ) " & _
+                "SELECT [dbo_tbl_Next_FY_Projection - Link].Account, [dbo_tbl_Next_FY_Projection - Link].AccountDesc, [dbo_tbl_Next_FY_Projection - Link].FiscalYear, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].ABCode, [dbo_tbl_Next_FY_Projection - Link].RollupCode, [dbo_tbl_Next_FY_Projection - Link].Period1, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period2, [dbo_tbl_Next_FY_Projection - Link].Period3, [dbo_tbl_Next_FY_Projection - Link].Period4, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period5, [dbo_tbl_Next_FY_Projection - Link].Period6, [dbo_tbl_Next_FY_Projection - Link].Period7, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period8, [dbo_tbl_Next_FY_Projection - Link].Period9, [dbo_tbl_Next_FY_Projection - Link].Period10, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period11, [dbo_tbl_Next_FY_Projection - Link].Period12, [dbo_tbl_Next_FY_Projection - Link].AnnualSum " & _
+                "FROM [dbo_tbl_Next_FY_Projection - Link] " & _
+                "WHERE ((([dbo_tbl_Next_FY_Projection - Link].FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+                "(([dbo_tbl_Next_FY_Projection - Link].ABCode)='Budget') AND (([dbo_tbl_Next_FY_Projection - Link].RollupCode)=[Forms]![Switchboard]![cmbCC]));"
+            DoCmd.RunSQL strSQL
+        
+        End If
+        
+    Else
+    
+        If strCC = "All Cost Centers w/o Sales and Marketing" Then
+                
+            strSQL = "INSERT INTO tbl_ForecastStaging ( Account, AccountDesc, FiscalYear, ABCode, RollupCode, Period1, Period2, Period3, " & _
+                "Period4, Period5, Period6, Period7, Period8, Period9, Period10, Period11, Period12, AnnualSum ) " & _
+                "SELECT [dbo_tbl_Next_FY_Projection - Link].Account, [dbo_tbl_Next_FY_Projection - Link].AccountDesc, [dbo_tbl_Next_FY_Projection - Link].FiscalYear, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].[ABCode], [dbo_tbl_Next_FY_Projection - Link].RollupCode, [dbo_tbl_Next_FY_Projection - Link].Period1, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period2, [dbo_tbl_Next_FY_Projection - Link].Period3, [dbo_tbl_Next_FY_Projection - Link].Period4, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period5, [dbo_tbl_Next_FY_Projection - Link].Period6, [dbo_tbl_Next_FY_Projection - Link].Period7, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period8, [dbo_tbl_Next_FY_Projection - Link].Period9, [dbo_tbl_Next_FY_Projection - Link].Period10, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period11, [dbo_tbl_Next_FY_Projection - Link].Period12, [dbo_tbl_Next_FY_Projection - Link].AnnualSum " & _
+                "FROM [dbo_tbl_Next_FY_Projection - Link] " & _
+                "WHERE ((([dbo_tbl_Next_FY_Projection - Link].FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+                "(([dbo_tbl_Next_FY_Projection - Link].[ABCode])='Budget') AND (([dbo_tbl_Next_FY_Projection - Link].RollupCode)<>'Sales and Marketing'));"
+            DoCmd.RunSQL strSQL
+        Else
+            strSQL = "INSERT INTO tbl_ForecastStaging ( Account, AccountDesc, FiscalYear, ABCode, RollupCode, Period1, Period2, Period3, " & _
+                "Period4, Period5, Period6, Period7, Period8, Period9, Period10, Period11, Period12, AnnualSum ) " & _
+                "SELECT [dbo_tbl_Next_FY_Projection - Link].Account, [dbo_tbl_Next_FY_Projection - Link].AccountDesc, [dbo_tbl_Next_FY_Projection - Link].FiscalYear, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].[ABCode], [dbo_tbl_Next_FY_Projection - Link].RollupCode, [dbo_tbl_Next_FY_Projection - Link].Period1, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period2, [dbo_tbl_Next_FY_Projection - Link].Period3, [dbo_tbl_Next_FY_Projection - Link].Period4, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period5, [dbo_tbl_Next_FY_Projection - Link].Period6, [dbo_tbl_Next_FY_Projection - Link].Period7, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period8, [dbo_tbl_Next_FY_Projection - Link].Period9, [dbo_tbl_Next_FY_Projection - Link].Period10, " & _
+                "[dbo_tbl_Next_FY_Projection - Link].Period11, [dbo_tbl_Next_FY_Projection - Link].Period12, [dbo_tbl_Next_FY_Projection - Link].AnnualSum " & _
+                "FROM [dbo_tbl_Next_FY_Projection - Link] " & _
+                "WHERE ((([dbo_tbl_Next_FY_Projection - Link].FiscalYear)=" & strQuote & strFY & strQuote & ") AND " & _
+                "(([dbo_tbl_Next_FY_Projection - Link].[ABCode])='Budget') AND (([dbo_tbl_Next_FY_Projection - Link].RollupCode)=[Forms]![Switchboard]![cmbCC]));"
+            DoCmd.RunSQL strSQL
+        
+        End If
+        
+    End If
+    
+RS1.Close
+    
+    If strCC = "All Cost Centers w/o Sales and Marketing" Then
+            
+        strSQL = "INSERT INTO tbl_ForecastStaging ( Account, AccountDesc, FiscalYear, ABCode, RollupCode, Period1, Period2, Period3, " & _
+            "Period4, Period5, Period6, Period7, Period8, Period9, Period10, Period11, Period12, AnnualSum ) " & _
+            "SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, " & _
+            "GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, " & _
+            "GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, " & _
+            "GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, " & _
+            "GL_ReportTransition.Period12, GL_ReportTransition.AnnualSum " & _
+            "FROM GL_ReportTransition " & _
+            "WHERE (((GL_ReportTransition.FiscalYear)=" & strQuote & strLY & strQuote & ") AND " & _
+            "((GL_ReportTransition.RollupCode)<>'Sales and Marketing'));"
+        DoCmd.RunSQL strSQL
+    Else
+        strSQL = "INSERT INTO tbl_ForecastStaging ( Account, AccountDesc, FiscalYear, ABCode, RollupCode, Period1, Period2, Period3, " & _
+            "Period4, Period5, Period6, Period7, Period8, Period9, Period10, Period11, Period12, AnnualSum ) " & _
+            "SELECT GL_ReportTransition.Account, GL_ReportTransition.AccountDesc, GL_ReportTransition.FiscalYear, GL_ReportTransition.ABCode, " & _
+            "GL_ReportTransition.RollupCode, GL_ReportTransition.Period1, GL_ReportTransition.Period2, GL_ReportTransition.Period3, " & _
+            "GL_ReportTransition.Period4, GL_ReportTransition.Period5, GL_ReportTransition.Period6, GL_ReportTransition.Period7, " & _
+            "GL_ReportTransition.Period8, GL_ReportTransition.Period9, GL_ReportTransition.Period10, GL_ReportTransition.Period11, " & _
+            "GL_ReportTransition.Period12, GL_ReportTransition.AnnualSum " & _
+            "FROM GL_ReportTransition " & _
+            "WHERE (((GL_ReportTransition.FiscalYear)=" & strQuote & strLY & strQuote & ") AND " & _
+            "((GL_ReportTransition.RollupCode)=[Forms]![Switchboard]![cmbCC]));"
+        DoCmd.RunSQL strSQL
+    End If
+    
+Set DB = CurrentDb()
+
+    If Forms!Switchboard!chkRalCorp.Value = True And strLY = "2007" Then 'Forms!Switchboard!cmbFY.Value = "2007" Then
+        strSQL = "UPDATE tbl_ForecastStaging SET tbl_ForecastStaging.Period1 = 0;"
+        DoCmd.RunSQL strSQL
+
+        strSQL = "UPDATE tbl_ForecastStaging SET tbl_ForecastStaging.Period2 = [Period2]*0.52 " & _
+                 "WHERE (((tbl_ForecastStaging.FiscalYear)<>'2007') AND ((tbl_ForecastStaging.RollupCode)<>'Sales'));"
+        DoCmd.RunSQL strSQL
+
+        strSQL = "UPDATE tbl_ForecastStaging SET tbl_ForecastStaging.Period2 = [Period2]*0.58 " & _
+                 "WHERE (((tbl_ForecastStaging.FiscalYear)<>'2007') AND ((tbl_ForecastStaging.RollupCode)='Sales'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+
+Set RS1 = DB.OpenRecordset("tbl_ReportingYear - Link", DB_OPEN_DYNASET)
+
+    If RS1.Fields("P9").Value = 0 Then
+        strSQL = "UPDATE [dbo_tbl_Next_FY_Forecast - Link] INNER JOIN tbl_ForecastStaging ON [dbo_tbl_Next_FY_Forecast - Link].Account = " & _
+            "tbl_ForecastStaging.Account SET tbl_ForecastStaging.Period9 = [dbo_tbl_Next_FY_Forecast - Link]![Period9] " & _
+            "WHERE (((tbl_ForecastStaging.FiscalYear)=" & strQuote & strLY & strQuote & ") AND ((tbl_ForecastStaging.ABCode)='Actual'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+
+    If RS1.Fields("P10").Value = 0 Then
+        strSQL = "UPDATE [dbo_tbl_Next_FY_Forecast - Link] INNER JOIN tbl_ForecastStaging ON [dbo_tbl_Next_FY_Forecast - Link].Account = " & _
+            "tbl_ForecastStaging.Account SET tbl_ForecastStaging.Period10 = [dbo_tbl_Next_FY_Forecast - Link]![Period10] " & _
+            "WHERE (((tbl_ForecastStaging.FiscalYear)=" & strQuote & strLY & strQuote & ") AND ((tbl_ForecastStaging.ABCode)='Actual'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+
+    If RS1.Fields("P11").Value = 0 Then
+        strSQL = "UPDATE [dbo_tbl_Next_FY_Forecast - Link] INNER JOIN tbl_ForecastStaging ON [dbo_tbl_Next_FY_Forecast - Link].Account = " & _
+            "tbl_ForecastStaging.Account SET tbl_ForecastStaging.Period11 = [dbo_tbl_Next_FY_Forecast - Link]![Period11] " & _
+            "WHERE (((tbl_ForecastStaging.FiscalYear)=" & strQuote & strLY & strQuote & ") AND ((tbl_ForecastStaging.ABCode)='Actual'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+
+    If RS1.Fields("P12").Value = 0 Then
+        strSQL = "UPDATE [dbo_tbl_Next_FY_Forecast - Link] INNER JOIN tbl_ForecastStaging ON [dbo_tbl_Next_FY_Forecast - Link].Account = " & _
+            "tbl_ForecastStaging.Account SET tbl_ForecastStaging.Period12 = [dbo_tbl_Next_FY_Forecast - Link]![Period12] " & _
+            "WHERE (((tbl_ForecastStaging.FiscalYear)=" & strQuote & strLY & strQuote & ") AND ((tbl_ForecastStaging.ABCode)='Actual'));"
+        DoCmd.RunSQL strSQL
+    Else
+    End If
+
+RS1.Close
+
+    strSQL = "UPDATE tbl_ForecastStaging SET tbl_ForecastStaging.AnnualSum = [tbl_ForecastStaging]![Period1]+[tbl_ForecastStaging]![Period2]+ " & _
+            "[tbl_ForecastStaging]![Period3]+[tbl_ForecastStaging]![Period4]+[tbl_ForecastStaging]![Period5]+[tbl_ForecastStaging]![Period6]+ " & _
+            "[tbl_ForecastStaging]![Period7]+[tbl_ForecastStaging]![Period8]+[tbl_ForecastStaging]![Period9]+[tbl_ForecastStaging]![Period10]+ " & _
+            "[tbl_ForecastStaging]![Period11]+[tbl_ForecastStaging]![Period12];"
+    DoCmd.RunSQL strSQL
+
+Set RS1 = DB.OpenRecordset("SELECT tbl_ForecastStaging.Account, tbl_ForecastStaging.FiscalYear, tbl_ForecastStaging.ABCode, " & _
+    "tbl_ForecastStaging.Period1, tbl_ForecastStaging.Period2, tbl_ForecastStaging.Period3, tbl_ForecastStaging.Period4, " & _
+    "tbl_ForecastStaging.Period5, tbl_ForecastStaging.Period6, tbl_ForecastStaging.Period7, tbl_ForecastStaging.Period8, " & _
+    "tbl_ForecastStaging.Period9, tbl_ForecastStaging.Period10, tbl_ForecastStaging.Period11, tbl_ForecastStaging.Period12, " & _
+    "tbl_ForecastStaging.AnnualSum " & _
+    "FROM tbl_ForecastStaging " & _
+    "WHERE (((tbl_ForecastStaging.FiscalYear)=" & strQuote & strFY & strQuote & ") AND ((tbl_ForecastStaging.ABCode)='Budget'));")
+   
+Set RS2 = DB.OpenRecordset("SELECT tbl_ForecastStaging.Account, tbl_ForecastStaging.FiscalYear, tbl_ForecastStaging.ABCode, " & _
+    "tbl_ForecastStaging.Period1, tbl_ForecastStaging.Period2, tbl_ForecastStaging.Period3, tbl_ForecastStaging.Period4, " & _
+    "tbl_ForecastStaging.Period5, tbl_ForecastStaging.Period6, tbl_ForecastStaging.Period7, tbl_ForecastStaging.Period8, " & _
+    "tbl_ForecastStaging.Period9, tbl_ForecastStaging.Period10, tbl_ForecastStaging.Period11, tbl_ForecastStaging.Period12, " & _
+    "tbl_ForecastStaging.AnnualSum " & _
+    "FROM tbl_ForecastStaging " & _
+    "WHERE (((tbl_ForecastStaging.FiscalYear)=" & strQuote & strLY & strQuote & ") AND ((tbl_ForecastStaging.ABCode)='Actual'));")
+    
+Set RS3 = DB.OpenRecordset("tbl_ForecastStaging", DB_OPEN_DYNASET)
+
+RS1.MoveFirst
+RS2.MoveFirst
+
+Do While Not RS2.EOF
+
+    Do While Not RS1.EOF
+    
+        If RS1.Fields("Account").Value = RS2.Fields("Account").Value Then
+            strAccount = RS1.Fields("Account").Value
+            curP1 = RS1.Fields("Period1").Value
+            curP2 = RS1.Fields("Period2").Value
+            curP3 = RS1.Fields("Period3").Value
+            curP4 = RS1.Fields("Period4").Value
+            curP5 = RS1.Fields("Period5").Value
+            curP6 = RS1.Fields("Period6").Value
+            curP7 = RS1.Fields("Period7").Value
+            curP8 = RS1.Fields("Period8").Value
+            curP9 = RS1.Fields("Period9").Value
+            curP10 = RS1.Fields("Period10").Value
+            curP11 = RS1.Fields("Period11").Value
+            curP12 = RS1.Fields("Period12").Value
+            curSum = curP1 + curP2 + curP3 + curP4 + curP5 + curP6 + curP7 + curP8 + curP9 + curP10 + curP11 + curP12
+            curLP1 = RS2.Fields("Period1").Value
+            curLP2 = RS2.Fields("Period2").Value
+            curLP3 = RS2.Fields("Period3").Value
+            curLP4 = RS2.Fields("Period4").Value
+            curLP5 = RS2.Fields("Period5").Value
+            curLP6 = RS2.Fields("Period6").Value
+            curLP7 = RS2.Fields("Period7").Value
+            curLP8 = RS2.Fields("Period8").Value
+            curLP9 = RS2.Fields("Period9").Value
+            curLP10 = RS2.Fields("Period10").Value
+            curLP11 = RS2.Fields("Period11").Value
+            curLP12 = RS2.Fields("Period12").Value
+            curLSum = curLP1 + curLP2 + curLP3 + curLP4 + curLP5 + curLP6 + curLP7 + curLP8 + curLP9 + curLP10 + curLP11 + curLP12
+            
+            If curP1 = 0 Or curLP1 = 0 Then
+                sglP1 = 0
+            Else
+                sglP1 = curP1 / curLP1
+            End If
+            
+            If curP2 = 0 Or curLP2 = 0 Then
+                sglP2 = 0
+            Else
+                sglP2 = curP2 / curLP2
+            End If
+            
+            If curP3 = 0 Or curLP3 = 0 Then
+                sglP3 = 0
+            Else
+                sglP3 = curP3 / curLP3
+            End If
+            
+            If curP4 = 0 Or curLP4 = 0 Then
+                sglP4 = 0
+            Else
+                sglP4 = curP4 / curLP4
+            End If
+            
+            If curP5 = 0 Or curLP5 = 0 Then
+                sglP5 = 0
+            Else
+                sglP5 = curP5 / curLP5
+            End If
+            
+            If curP6 = 0 Or curLP6 = 0 Then
+                sglP6 = 0
+            Else
+                sglP6 = curP6 / curLP6
+            End If
+            
+            If curP7 = 0 Or curLP7 = 0 Then
+                sglP7 = 0
+            Else
+                sglP7 = curP7 / curLP7
+            End If
+            
+            If curP8 = 0 Or curLP8 = 0 Then
+                sglP8 = 0
+            Else
+                sglP8 = curP8 / curLP8
+            End If
+            
+            If curP9 = 0 Or curLP9 = 0 Then
+                sglP9 = 0
+            Else
+                sglP9 = curP9 / curLP9
+            End If
+            
+            If curP10 = 0 Or curLP10 = 0 Then
+                sglP10 = 0
+            Else
+                sglP10 = curP10 / curLP10
+            End If
+            
+            If curP11 = 0 Or curLP11 = 0 Then
+                sglP11 = 0
+            Else
+                sglP11 = curP11 / curLP11
+            End If
+            
+            If curP12 = 0 Or curLP12 = 0 Then
+                sglP12 = 0
+            Else
+                sglP12 = curP12 / curLP12
+            End If
+            
+            If curSum = 0 Or curLSum = 0 Then
+                sglSum = 0
+            Else
+                sglSum = curSum / curLSum
+            End If
+            
+            RS3.MoveFirst
+            
+            Do While Not RS3.EOF
+            
+                If strAccount = RS3.Fields("Account").Value Then
+                    RS3.Edit
+                    RS3.Fields("P1Perc").Value = sglP1
+                    RS3.Fields("P2Perc").Value = sglP2
+                    RS3.Fields("P3Perc").Value = sglP3
+                    RS3.Fields("P4Perc").Value = sglP4
+                    RS3.Fields("P5Perc").Value = sglP5
+                    RS3.Fields("P6Perc").Value = sglP6
+                    RS3.Fields("P7Perc").Value = sglP7
+                    RS3.Fields("P8Perc").Value = sglP8
+                    RS3.Fields("P9Perc").Value = sglP9
+                    RS3.Fields("P10Perc").Value = sglP10
+                    RS3.Fields("P11Perc").Value = sglP11
+                    RS3.Fields("P12Perc").Value = sglP12
+                    RS3.Fields("SumPerc").Value = sglSum
+                    RS3.Update
+                    RS3.MoveNext
+                    
+                    If RS1.EOF Then
+                        Exit Do
+                    Else
+                        RS1.MoveNext
+                    End If
+                
+                Else
+                    RS3.MoveNext
+                End If
+                
+            Loop
+        
+        Else
+            RS1.MoveNext
+        End If
+        
+    Loop
+        
+    RS2.MoveNext
+    RS1.MoveFirst
+    
+Loop
+        
+' Opens, for preview, the proper forecast report for a given Cost Center,
+' or group of Cost Centers.
+    
+    If strCC = "Sales" Then
+        stDocName = "rpt_ForecastingSales"
+    Else
+        If strCC = "All Cost Centers w/o Sales and Marketing" Then
+            stDocName = "rpt_Forecasting_w_Sales_Comp"
+        Else
+            stDocName = "rpt_Forecasting"
+        End If
+    End If
+       
+    DoCmd.OpenReport stDocName, acPreview
+
+End Function
